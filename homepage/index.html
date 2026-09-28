@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>建站啦后台管理系统 - 开箱即用的现代后台框架</title>
+<meta name="description" content="基于 ThinkPHP8 + Vue3 + Element Plus 的开源后台管理框架：RBAC 权限、数据权限、代码生成器、插件系统、远程升级（OTA）、系统监控，开箱即用。">
+<!--
+  GitHub 仓库地址配置：修改下方 GITHUB_REPO 变量值即可切换真实仓库
+  本页零依赖，可直接部署到 GitHub Pages / 任意静态服务器
+-->
+<script>
+  var GITHUB_REPO = "https://github.com/hugefuture/jianzhanla"; // ← 替换为你的真实仓库地址
+  document.addEventListener("DOMContentLoaded", function () {
+    var links = document.querySelectorAll("[data-gh]");
+    for (var i = 0; i < links.length; i++) {
+      links[i].href = GITHUB_REPO + links[i].getAttribute("data-gh");
+      links[i].target = "_blank";
+      links[i].rel = "noopener";
+    }
+  });
+</script>
+<style>
+  :root {
+    --primary: #1e6fff;
+    --primary-dark: #0e56d9;
+    --primary-light: #e8f1ff;
+    --text: #1a2233;
+    --text-2: #556070;
+    --text-3: #8a94a6;
+    --bg: #ffffff;
+    --bg-soft: #f6f9fc;
+    --border: #e5eaf2;
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(30, 111, 255, .08);
+    --shadow-lg: 0 12px 40px rgba(26, 34, 51, .12);
+    --mono: "JetBrains Mono", Consolas, "Courier New", monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    color: var(--text); background: var(--bg); line-height: 1.7;
+  }
+  .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  a { text-decoration: none; color: inherit; }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255, 255, 255, .92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; }
+  .brand .logo {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--primary), #6aa6ff);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 17px; font-weight: 800; box-shadow: var(--shadow);
+  }
+  .nav-links { display: flex; align-items: center; gap: 28px; font-size: 14.5px; color: var(--text-2); }
+  .nav-links a:hover { color: var(--primary); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 20px; border-radius: 8px; font-size: 14.5px; font-weight: 600;
+    transition: all .2s; cursor: pointer; border: none;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn-ghost { border: 1px solid var(--border); color: var(--text); background: #fff; }
+  .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+  .btn-lg { padding: 13px 30px; font-size: 16px; border-radius: 10px; }
+
+  /* ---------- Hero ---------- */
+  header { padding: 90px 0 70px; text-align: center; position: relative; overflow: hidden; }
+  header::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(600px 300px at 20% 0%, rgba(30, 111, 255, .07), transparent),
+      radial-gradient(600px 300px at 80% 10%, rgba(106, 166, 255, .08), transparent);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--primary-light); color: var(--primary);
+    font-size: 13px; font-weight: 600; padding: 5px 14px; border-radius: 999px;
+    margin-bottom: 22px;
+  }
+  .hero-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--primary); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  h1 { font-size: clamp(34px, 5vw, 52px); font-weight: 800; letter-spacing: -1px; line-height: 1.25; }
+  h1 .grad {
+    background: linear-gradient(120deg, var(--primary), #4d94ff);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-sub { max-width: 640px; margin: 20px auto 34px; font-size: 17px; color: var(--text-2); }
+  .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .github-icon { width: 18px; height: 18px; fill: currentColor; }
+
+  /* ---------- Stats ---------- */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 56px; }
+  .stat {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 22px 16px; box-shadow: var(--shadow); transition: transform .2s;
+  }
+  .stat:hover { transform: translateY(-3px); }
+  .stat b { display: block; font-size: 26px; color: var(--primary); font-weight: 800; }
+  .stat span { font-size: 13px; color: var(--text-3); }
+
+  /* ---------- Sections ---------- */
+  section { padding: 80px 0; }
+  section.alt { background: var(--bg-soft); }
+  .sec-head { text-align: center; margin-bottom: 48px; }
+  .sec-head .tag { color: var(--primary); font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .sec-head h2 { font-size: 30px; font-weight: 800; margin: 8px 0 12px; letter-spacing: -.5px; }
+  .sec-head p { color: var(--text-2); font-size: 15.5px; max-width: 560px; margin: 0 auto; }
+
+  /* ---------- Tech stack ---------- */
+  .tech-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  .tech {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 22px 12px; text-align: center; transition: all .2s;
+  }
+  .tech:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+  .tech .t-icon { font-size: 28px; }
+  .tech b { display: block; margin: 8px 0 2px; font-size: 15px; }
+  .tech span { font-size: 12.5px; color: var(--text-3); }
+
+  /* ---------- Features ---------- */
+  .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .feat {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 26px 24px; transition: all .25s; position: relative; overflow: hidden;
+  }
+  .feat:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: transparent; }
+  .feat::after {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--primary), #6aa6ff);
+    opacity: 0; transition: opacity .25s;
+  }
+  .feat:hover::after { opacity: 1; }
+  .feat .f-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: var(--primary-light); color: var(--primary);
+    display: flex; align-items: center; justify-content: center; font-size: 21px;
+    margin-bottom: 14px;
+  }
+  .feat h3 { font-size: 16.5px; font-weight: 700; margin-bottom: 8px; }
+  .feat p { font-size: 13.8px; color: var(--text-2); }
+  .feat .pill {
+    display: inline-block; margin-top: 10px; font-size: 11.5px; font-weight: 600;
+    color: var(--primary); background: var(--primary-light); border-radius: 5px; padding: 2px 8px;
+  }
+
+  /* ---------- Highlights ---------- */
+  .hl-row { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center; }
+  .hl-row + .hl-row { margin-top: 64px; }
+  .hl-row.flip .hl-visual { order: 2; }
+  .hl-text .tag { color: var(--primary); font-size: 13px; font-weight: 700; letter-spacing: 1.5px; }
+  .hl-text h3 { font-size: 24px; font-weight: 800; margin: 10px 0 14px; }
+  .hl-text p { color: var(--text-2); font-size: 15px; margin-bottom: 14px; }
+  .hl-text ul { list-style: none; }
+  .hl-text li { font-size: 14px; color: var(--text-2); padding: 5px 0 5px 26px; position: relative; }
+  .hl-text li::before { content: "✓"; position: absolute; left: 0; color: var(--primary); font-weight: 800; }
+  .hl-visual {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 22px; box-shadow: var(--shadow);
+  }
+  .code-block {
+    background: #141b2d; border-radius: 10px; overflow: hidden;
+    font-family: var(--mono); font-size: 13px; color: #c9d6f0;
+  }
+  .code-block .cb-bar {
+    display: flex; gap: 6px; padding: 11px 14px; border-bottom: 1px solid rgba(255, 255, 255, .08);
+  }
+  .code-block .cb-bar i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+  .code-block .cb-bar i:nth-child(1) { background: #ff5f57; }
+  .code-block .cb-bar i:nth-child(2) { background: #febc2e; }
+  .code-block .cb-bar i:nth-child(3) { background: #28c840; }
+  .code-block pre { padding: 16px 18px; overflow-x: auto; line-height: 1.8; }
+  .code-block .c { color: #5b6b8c; }
+  .code-block .k { color: #6aa6ff; }
+  .code-block .s { color: #7ee0a0; }
+  .code-block .g { color: #ffd479; }
+
+  /* plugin cards */
+  .plugin-demo { display: grid; gap: 10px; }
+  .plugin-card {
+    display: flex; align-items: center; gap: 14px;
+    border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px;
+    transition: all .2s; background: #fff;
+  }
+  .plugin-card:hover { border-color: var(--primary); }
+  .plugin-card .p-ico {
+    width: 38px; height: 38px; border-radius: 9px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .plugin-card b { font-size: 14px; display: block; }
+  .plugin-card span { font-size: 12.5px; color: var(--text-3); }
+  .plugin-card .p-state { margin-left: auto; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+  .p-on { color: #0fa958; background: #e6f7ee; }
+  .p-off { color: var(--text-3); background: var(--bg-soft); }
+
+  /* ---------- Quick start ---------- */
+  .qs-wrap { max-width: 760px; margin: 0 auto; }
+  .qs-steps { display: grid; gap: 14px; margin-top: 22px; }
+  .qs-step {
+    display: flex; gap: 16px; background: #fff; border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 20px; align-items: flex-start;
+  }
+  .qs-step .no {
+    width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+    background: var(--primary); color: #fff; font-weight: 800; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .qs-step b { font-size: 14.5px; display: block; margin-bottom: 4px; }
+  .qs-step code {
+    font-family: var(--mono); font-size: 12.8px; background: var(--bg-soft);
+    border: 1px solid var(--border); padding: 2px 8px; border-radius: 5px; color: var(--primary-dark);
+  }
+  .qs-step p { font-size: 13.5px; color: var(--text-2); }
+
+  /* ---------- CTA ---------- */
+  .cta-box {
+    background: linear-gradient(135deg, #123c8f, var(--primary));
+    border-radius: 18px; padding: 56px 32px; text-align: center; color: #fff;
+    position: relative; overflow: hidden;
+  }
+  .cta-box::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(400px 200px at 80% 0%, rgba(255, 255, 255, .15), transparent);
+  }
+  .cta-box h2 { font-size: 28px; font-weight: 800; position: relative; }
+  .cta-box p { margin: 12px 0 28px; opacity: .85; position: relative; }
+  .cta-box .btn-white { background: #fff; color: var(--primary); position: relative; }
+  .cta-box .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0, 0, 0, .25); }
+  .cta-box .btn-outline { border: 1.5px solid rgba(255, 255, 255, .5); color: #fff; position: relative; margin-left: 12px; }
+  .cta-box .btn-outline:hover { background: rgba(255, 255, 255, .12); }
+
+  /* ---------- Footer ---------- */
+  footer { border-top: 1px solid var(--border); padding: 34px 0; margin-top: 20px; }
+  .foot-inner {
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;
+    font-size: 13.5px; color: var(--text-3);
+  }
+  .foot-inner a { color: var(--text-2); }
+  .foot-inner a:hover { color: var(--primary); }
+
+  @media (max-width: 860px) {
+    .feat-grid { grid-template-columns: 1fr 1fr; }
+    .tech-grid { grid-template-columns: repeat(3, 1fr); }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .hl-row { grid-template-columns: 1fr; }
+    .hl-row.flip .hl-visual { order: 0; }
+    .nav-links a.hide-m { display: none; }
+  }
+  @media (max-width: 560px) {
+    .feat-grid { grid-template-columns: 1fr; }
+    .tech-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<nav>
+  <div class="container nav-inner">
+    <a class="brand" href="#top">
+      <span class="logo">建</span>
+      <span>建站啦后台管理系统</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features" class="hide-m">功能特性</a>
+      <a href="#plugin" class="hide-m">插件系统</a>
+      <a href="#upgrade" class="hide-m">远程升级</a>
+      <a href="#quickstart" class="hide-m">快速开始</a>
+      <a class="btn btn-primary" data-gh="">
+        <svg class="github-icon" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header id="top">
+  <div class="container">
+    <div class="hero-badge"><span class="dot"></span> ThinkPHP8 · Vue3 · Element Plus · 开源免费</div>
+    <h1>开箱即用的<br><span class="grad">现代后台管理框架</span></h1>
+    <p class="hero-sub">
+      建站啦后台管理系统 —— 四层架构、RBAC + 数据权限、代码生成器、插件生态、
+      远程升级（OTA）一站配齐。让中后台项目从 0 到 1 只需一杯咖啡的时间。
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary btn-lg" data-gh="/releases">
+        <svg class="github-icon" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        GitHub 下载
+      </a>
+      <a class="btn btn-ghost btn-lg" href="#quickstart">快速开始 →</a>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b>30+</b><span>功能模块</span></div>
+      <div class="stat"><b>73+</b><span>PHPUnit 单元测试</span></div>
+      <div class="stat"><b>400+</b><span>端到端验证用例</span></div>
+      <div class="stat"><b>5 种</b><span>数据权限粒度</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= TECH ================= -->
+<section class="alt">
+  <div class="container">
+    <div class="sec-head">
+      <div class="tag">TECH STACK</div>
+      <h2>主流技术栈，长期可维护</h2>
+      <p>全部选用社区活跃、文档完善的主流方案，不造轮子、不绑死小众依赖。</p>
+    </div>
+    <div class="tech-grid">
+      <div class="tech"><div class="t-icon">🐘</div><b>ThinkPHP 8</b><span>多应用后端</span></div>
+      <div class="tech"><div class="t-icon">⚡</div><b>Vue 3</b><span>Composition API</span></div>
+      <div class="tech"><div class="t-icon">🧩</div><b>Element Plus</b><span>企业级组件库</span></div>
+      <div class="tech"><div class="t-icon">📦</div><b>Vite 6</b><span>极速构建</span></div>
+      <div class="tech"><div class="t-icon">🐬</div><b>MySQL</b><span>5.7 / 8.0</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURES ================= -->
+<section id="features">
+  <div class="container">
+    <div class="sec-head">
+      <div class="tag">FEATURES</div>
+      <h2>一个后台该有的，都有</h2>
+      <p>从权限体系到运维监控，覆盖中后台项目 90% 的通用需求，其余交给插件。</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="f-icon">🔐</div>
+        <h3>RBAC 权限体系</h3>
+        <p>用户 / 角色 / 菜单 / 按钮四级权限，动态路由按权限渲染，接口层双重校验。</p>
+        <span class="pill">菜单 + 按钮级</span>
+      </div>
+      <div class="feat">
+        <div class="f-icon">🌐</div>
+        <h3>数据权限</h3>
+        <p>全部 / 本部门 / 本部门及以下 / 仅本人 / 自定义五种数据范围，SQL 层自动注入。</p>
+        <span class="pill">5 种 scope</span>
+      </div>
+      <div class="feat">
+        <div class="f-icon">🛡️</div>
+        <h3>登录防护</h3>
+        <p>图形验证码、失败锁定、异地踢下线、Token 自动续期，安全策略开箱即用。</p>
+        <span class="pill">JWT + 锁定</span>
+      </div>
+      <div class="feat">
+        <div class="f-icon">⚙️</div>
+        <h3>代码生成器</h3>
+        <p>选表 → 预览 → 生成，一键产出 Model / Dao / Service / Controller / 前端页面全套 CRUD 代码。</p>
+        <span class="pill">提效 10 倍</span>
+      </div>
+      <div class="feat">
+        <div class="f-icon">📊</div>
+        <h3>Excel 导入导出</h3>
+        <p>phpspreadsheet 灵活导入 + OpenSpout 真流式导出，50 万行不爆内存，自动分 Sheet。</p>
+        <span class="pill">流式 50W 行</span>
+      </div>
+      <div class="feat">
+        <div class="f-icon">📁</div>
+        <h3>文件管理</h3>
+        <p>后缀白名单 + 真实 MIME 嗅探 + 大小钳制，鉴权下载支持 Token 参数透传。</p>
+        <span class="pill">安全加固</span>
+      </div>
+      <div class="feat">
+        <div class="f-icon">📋</div>
+        <h3>日志与审计</h3>
+        <p>操作日志 / 登录日志 / 任务日志三类审计，中间件自动埋点，页面可视化检索。</p>
+        <span class="pill">3 类日志</span>
+      </div>
+      <div class="feat">
+        <div class="f-icon">🖥️</div>
+        <h3>系统监控</h3>
+        <p>CPU / 内存 / 磁盘 / MySQL 连接与库表容量实时概览，ECharts 可视化看板。</p>
+        <span class="pill">实时概览</span>
+      </div>
+      <div class="feat">
+        <div class="f-icon">⏰</div>
+        <h3>定时任务</h3>
+        <p>内置任务调度器，日志清理、缓存清理、数据备份自动轮转，支持自定义扩展。</p>
+        <span class="pill">Cron 调度</span>
+      </div>
+      <div class="feat">
+        <div class="f-icon">💾</div>
+        <h3>数据备份</h3>
+        <p>mysqldump 整库导出、自动保留 N 份滚动轮转，升级前自动快照兜底。</p>
+        <span class="pill">自动轮转</span>
+      </div>
+      <div class="feat">
+        <div class="f-icon">🔌</div>
+        <h3>插件系统</h3>
+        <p>目录 + 清单即插件：菜单、接口、页面、钩子全部自动注册，装卸不停服。</p>
+        <span class="pill">见下方详解</span>
+      </div>
+      <div class="feat">
+        <div class="f-icon">🚀</div>
+        <h3>远程升级（OTA）</h3>
+        <p>后台一键升级：签名校验、自动备份、断点回滚，产品迭代不再手工传包。</p>
+        <span class="pill">见下方详解</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PLUGIN ================= -->
+<section id="plugin" class="alt">
+  <div class="container">
+    <div class="sec-head">
+      <div class="tag">PLUGIN SYSTEM</div>
+      <h2>插件化架构，业务随装随用</h2>
+      <p>不改一行主干代码，一个目录 + 一份 plugin.json 就是完整业务模块。</p>
+    </div>
+    <div class="hl-row">
+      <div class="hl-text">
+        <div class="tag">HOOKS &amp; MODULES</div>
+        <h3>钩子驱动的插件内核</h3>
+        <p>插件可以声明菜单、接口、前端页面与事件钩子，安装瞬间全部就位；卸载即清理，主程序零污染。</p>
+        <ul>
+          <li>登录成功 / 失败、公告发布等事件钩子埋点，payload 链式改写</li>
+          <li>插件接口自动继承 Token 鉴权与操作日志中间件</li>
+          <li>配置项按 JSON Schema 动态渲染表单，类型自动转换</li>
+          <li>单个插件异常自动隔离，不影响主流程</li>
+        </ul>
+      </div>
+      <div class="hl-visual">
+        <div class="code-block">
+          <div class="cb-bar"><i></i><i></i><i></i></div>
+<pre><span class="c">// backend/plugin/hello/plugin.json</span>
+{
+  <span class="g">"name"</span>: <span class="s">"hello"</span>,
+  <span class="g">"title"</span>: <span class="s">"示例插件"</span>,
+  <span class="g">"hooks"</span>: {
+    <span class="g">"notice.publish.after"</span>: { <span class="g">"priority"</span>: <span class="k">10</span> }
+  },
+  <span class="g">"routes"</span>: [
+    { <span class="g">"rule"</span>: <span class="s">"index"</span>, <span class="g">"action"</span>: <span class="s">"Index/index"</span> }
+  ],
+  <span class="g">"menu"</span>: { <span class="g">"title"</span>: <span class="s">"Hello 示例"</span> }
+}</pre>
+        </div>
+        <div class="plugin-demo" style="margin-top:16px">
+          <div class="plugin-card">
+            <div class="p-ico" style="background:#e8f1ff;color:#1e6fff">👋</div>
+            <div><b>hello 示例插件</b><span>菜单 + 接口 + 页面 + 钩子完整示例</span></div>
+            <span class="p-state p-on">已启用</span>
+          </div>
+          <div class="plugin-card">
+            <div class="p-ico" style="background:#fff4e6;color:#f08c00">🔔</div>
+            <div><b>login-notify 登录动态</b><span>监听登录事件，沉淀登录统计</span></div>
+            <span class="p-state p-off">未安装</span>
+          </div>
+          <div class="plugin-card">
+            <div class="p-ico" style="background:#f0e9ff;color:#7c3aed">🧩</div>
+            <div><b>你的下一个业务插件</b><span>目录 + plugin.json，十分钟接入</span></div>
+            <span class="p-state p-on">可开发</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= UPGRADE ================= -->
+<section id="upgrade">
+  <div class="container">
+    <div class="hl-row flip">
+      <div class="hl-text">
+        <div class="tag">OTA UPGRADE</div>
+        <h3>后台一键远程升级</h3>
+        <p>产品迭代不再 FTP 传包：检查更新 → 下载 → 校验 → 备份 → 落盘 → 执行 SQL → 回写版本，全链路自动，出问题一键回滚。</p>
+        <ul>
+          <li>sha256 + HMAC 双重签名校验，杜绝升级包被篡改</li>
+          <li>路径白名单 + 防 Zip Slip 路径穿越攻击</li>
+          <li>危险 SQL 拦截（drop database / grant 等）</li>
+          <li>升级前自动备份，支持「仅文件」/「含数据库」两档回滚</li>
+          <li>升级日志独立成表，回滚后审计链依然完整</li>
+        </ul>
+      </div>
+      <div class="hl-visual">
+        <div class="code-block">
+          <div class="cb-bar"><i></i><i></i><i></i></div>
+<pre><span class="c"># 发布：本地一键打升级包</span>
+$ php tools/make-upgrade-package.php <span class="g">--version=1.2.0</span>
+
+<span class="c"># 产物推到升级源（任意静态 HTTP 服务）</span>
+tools/upgrade-repo/
+├── manifest.json              <span class="c"># 版本清单（含 sha256）</span>
+└── jianzhanla-admin-1.2.0.zip
+
+<span class="c"># 后台：系统管理 → 系统升级 → 检查更新</span>
+<span class="k">✔</span> 拉取清单    <span class="k">✔</span> 签名校验
+<span class="k">✔</span> 下载安装包  <span class="k">✔</span> 自动备份
+<span class="k">✔</span> 文件落盘    <span class="k">✔</span> 执行 SQL
+<span class="s">✔ 升级完成：1.1.0 → 1.2.0（可一键回滚）</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= QUICKSTART ================= -->
+<section id="quickstart" class="alt">
+  <div class="container">
+    <div class="sec-head">
+      <div class="tag">QUICK START</div>
+      <h2>三分钟跑起来</h2>
+      <p>克隆、导入、启动 —— Windows 双击批处理，Linux 三条命令。</p>
+    </div>
+    <div class="qs-wrap">
+      <div class="code-block">
+        <div class="cb-bar"><i></i><i></i><i></i></div>
+<pre><span class="c"># 1. 克隆仓库</span>
+git clone https://github.com/hugefuture/jianzhanla.git
+cd jianzhanla-admin
+
+<span class="c"># 2. 导入数据库（sql/init.sql 含演示数据）</span>
+mysql -uroot -p sdccc_admin &lt; sql/init.sql
+
+<span class="c"># 3a. Windows：双击 start-server.bat 一键启动</span>
+<span class="c"># 3b. Linux / macOS：</span>
+cd backend &amp;&amp; php think run
+cd frontend &amp;&amp; npm install &amp;&amp; npm run dev</pre>
+      </div>
+      <div class="qs-steps">
+        <div class="qs-step">
+          <span class="no">1</span>
+          <div>
+            <b>默认账号</b>
+            <p>管理员 <code>admin / 123456</code>（超管），演示账号 <code>test / 123456</code>，登录后请在「系统管理 → 个人中心」修改密码。</p>
+          </div>
+        </div>
+        <div class="qs-step">
+          <span class="no">2</span>
+          <div>
+            <b>环境要求</b>
+            <p>PHP <code>8.1+</code>（需 pdo_mysql / gd / fileinfo / zip / curl 扩展）、MySQL <code>5.7+</code>、Node.js <code>18+</code>。</p>
+          </div>
+        </div>
+        <div class="qs-step">
+          <span class="no">3</span>
+          <div>
+            <b>验证安装</b>
+            <p>后端 <code>http://127.0.0.1:8000/admin</code>，前端 <code>http://localhost:5183</code>；配套 <code>tools/</code> 下 17 个验证脚本、73 个单元测试可一键回归。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section>
+  <div class="container">
+    <div class="cta-box">
+      <h2>准备好开始了吗？</h2>
+      <p>Star 一下，用建站啦把下一个中后台项目的脚手架时间省下来。</p>
+      <div>
+        <a class="btn btn-white btn-lg" data-gh="">
+          <svg class="github-icon" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          Star on GitHub
+        </a>
+        <a class="btn btn-outline btn-lg" data-gh="/archive/refs/heads/main.zip">直接下载 ZIP</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="container foot-inner">
+    <div>© 2026 建站啦 · 建站啦后台管理系统 · 基于 MIT 协议开源</div>
+    <div>
+      <a data-gh="">GitHub</a> ·
+      <a data-gh="/releases">Releases</a> ·
+      <a data-gh="/issues">问题反馈</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

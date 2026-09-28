@@ -1,0 +1,30 @@
+{
+  "name": "hello",
+  "title": "Hello 示例插件",
+  "version": "1.0.0",
+  "author": "建站啦",
+  "description": "最小可运行插件示范：自带菜单、后端接口、前端页面，并监听公告发布事件",
+  "class": "Plugin",
+  "routes": [
+    { "method": "get", "rule": "index", "action": "Index/index", "desc": "插件信息" },
+    { "method": "get", "rule": "greet", "action": "Index/greet", "desc": "按配置生成问候语" }
+  ],
+  "menus": [
+    {
+      "name": "Hello 插件",
+      "path": "hello",
+      "component": "plugin/hello/index",
+      "perms": "plugin:hello:index",
+      "icon": "MagicStick",
+      "order_num": 10,
+      "remark": "Hello 示例插件自动注册"
+    }
+  ],
+  "config": [
+    { "key": "greeting", "label": "问候语", "type": "text", "default": "你好，这是来自插件的问候", "required": true, "tip": "会在插件页面与 greet 接口中展示" },
+    { "key": "show_time", "label": "显示服务器时间", "type": "switch", "default": 1 },
+    { "key": "theme", "label": "展示风格", "type": "select", "default": "blue", "options": { "blue": "蓝白极简", "green": "清新绿", "gray": "沉稳灰" } },
+    { "key": "max_items", "label": "展示条目上限", "type": "number", "default": 5 }
+  ],
+  "hooks": ["notice.publish.after"]
+}

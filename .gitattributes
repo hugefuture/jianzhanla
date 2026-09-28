@@ -1,0 +1,18 @@
+# 统一换行符：仓库内保存 LF，检出时按平台转换（Windows 自动 CRLF）
+* text=auto eol=lf
+
+# 二进制文件不做换行转换与 diff
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.zip binary
+*.phar binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+
+# 批处理脚本在 Windows 下必须 CRLF
+*.bat text eol=crlf

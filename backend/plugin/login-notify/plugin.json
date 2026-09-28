@@ -1,0 +1,30 @@
+{
+  "name": "login-notify",
+  "title": "登录动态记录",
+  "version": "1.0.0",
+  "author": "建站啦",
+  "description": "钩子型插件示范：监听登录成功/失败事件，沉淀最近登录动态并提供统计接口与页面",
+  "class": "Plugin",
+  "routes": [
+    { "method": "get", "rule": "stats", "action": "Index/stats", "desc": "登录统计" },
+    { "method": "get", "rule": "recent", "action": "Index/recent", "desc": "最近动态" },
+    { "method": "post", "rule": "clear", "action": "Index/clear", "desc": "清空记录" }
+  ],
+  "menus": [
+    {
+      "name": "登录动态",
+      "path": "login-notify",
+      "component": "plugin/login-notify/index",
+      "perms": "plugin:login-notify:index",
+      "icon": "Bell",
+      "order_num": 11,
+      "remark": "登录动态插件自动注册"
+    }
+  ],
+  "config": [
+    { "key": "keep_count", "label": "保留条数", "type": "number", "default": 100, "tip": "超出后按时间丢弃最旧的记录" },
+    { "key": "alert_on_fail", "label": "记录失败登录", "type": "switch", "default": 1 },
+    { "key": "webhook", "label": "告警 Webhook", "type": "text", "default": "", "tip": "可选，示例插件只做记录不实际推送" }
+  ],
+  "hooks": ["user.login.success", "user.login.fail"]
+}

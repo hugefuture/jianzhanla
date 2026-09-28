@@ -1,0 +1,44 @@
+# ---------- 依赖 ----------
+frontend/node_modules/
+backend/vendor/
+.npm-cache/
+frontend/.cache-fresh/
+.cache*/
+*.log
+npm-debug.log*
+
+# ---------- 本地环境 / 密钥（切勿提交）----------
+backend/.env
+.env
+*.key
+*.pem
+
+# ---------- 运行时产物 ----------
+backend/runtime/
+frontend/dist/
+backend/public/uploads/*
+!backend/public/uploads/.gitkeep
+
+# ---------- 本地临时 MySQL 实例（开发用，约 200MB）----------
+.smoke/
+
+# ---------- 备份与演示产物 ----------
+sql/hm-tables-backup-*.sql
+tools/upgrade-repo/
+
+# ---------- 验证脚本临时文件 ----------
+tools/.captcha*.json
+.captcha*.json
+.captcha-lock.json
+
+# ---------- 其它临时目录 ----------
+.demo.sql
+_kangheng_cleanup_tmp/
+*.log
+*.tmp
+
+# ---------- 编辑器 / 系统 ----------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

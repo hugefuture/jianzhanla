@@ -1,0 +1,70 @@
+// 全局样式：蓝白极简
+:root {
+  --sd-primary: #2563eb;
+  --sd-primary-light: #3b82f6;
+  --sd-bg: #f5f7fa;
+  --sd-border: #e4e7ed;
+  --sd-text: #303133;
+  --sd-text-secondary: #909399;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+  color: var(--sd-text);
+  background: var(--sd-bg);
+}
+
+// 通用页面容器
+.page-card {
+  background: #fff;
+  border-radius: 6px;
+  padding: 16px;
+  min-height: 100%;
+}
+
+// 搜索栏
+.search-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+
+  .el-input,
+  .el-select {
+    width: 200px;
+  }
+}
+
+// 表格分页
+.pagination-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+// 对话框
+.el-dialog {
+  .el-dialog__header {
+    border-bottom: 1px solid var(--sd-border);
+    margin-right: 0;
+  }
+}
+
+// 滚动条
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #c0c4cc;
+  border-radius: 3px;
+}
